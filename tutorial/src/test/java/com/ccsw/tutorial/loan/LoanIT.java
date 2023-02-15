@@ -45,13 +45,12 @@ public class LoanIT {
     public static final String CLIENT_NAME_WITH_2_LOANS = "Eric";
     public static final String GAME_NAME_LOANED = "On Mars";
     public static final Date INITIAL_DATE_EXISTING_LOAN = new Date(2023, 01, 17);
-    public static final Date FINAL_DATE_EXISTING_LOAN = new Date(2023, 02, 01);
-
+    public static final Date FINAL_DATE_EXISTING_LOAN = new Date(2023, 01, 25);
     public static final String ERROR_SAME_GAME_MORE_THAN_ONE_CLIENT = "El mismo juego no puede estar prestado a dos clientes distintos en un mismo día.";
     public static final String ERROR_SAME_CLIENT_MORE_THAN_TWO_GAMES = "El cliente no puede tener más de 2 juegos en un mismo día";
 
     private static final int TOTAL_LOANS = 6;
-    private static final int PAGE_SIZE = 6;
+    private static final int PAGE_SIZE = 5;
 
     @LocalServerPort
     private int port;
@@ -168,30 +167,24 @@ public class LoanIT {
 
     @Test
     public void saveSameGameByMoreThanOneClientShouldThrowError() {
-        long newLoanId = TOTAL_LOANS + 1;
-        long newLoanSize = TOTAL_LOANS + 1;
-
         LoanDto dto = new LoanDto();
-        dto.setClientName(NEW_LOAN_CLIENT_NAME);
+        dto.setClientName(CLIENT_NAME_WITH_2_LOANS);
         dto.setGameName(GAME_NAME_LOANED);
         dto.setInitialDate(INITIAL_DATE_EXISTING_LOAN);
         dto.setFinalDate(FINAL_DATE_EXISTING_LOAN);
 
-        restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), responseTypePage);
+        restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
 
         LoanSearchDto searchDto = new LoanSearchDto();
-        searchDto.setPageable(PageRequest.of(0, (int) newLoanSize));
+        searchDto.setPageable(PageRequest.of(0, TOTAL_LOANS));
 
         ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.POST,
                 new HttpEntity<>(searchDto), responseTypePage);
 
         assertNotNull(response);
-        assertEquals(newLoanSize, response.getBody().getTotalElements());
-
-        LoanDto loan = response.getBody().getContent().stream().filter(item -> item.getId().equals(newLoanId))
-                .findFirst().orElse(null);
-        assertNotNull(loan);
-        assertEquals(NEW_LOAN_CLIENT_NAME, loan.getClientName());
+        assertEquals(TOTAL_LOANS, response.getBody().getTotalElements());
+        // assertEquals(EXISTS_GAME_ID, response.getBody().get(0).getId());
+        // test commit
     }
 
     @Test

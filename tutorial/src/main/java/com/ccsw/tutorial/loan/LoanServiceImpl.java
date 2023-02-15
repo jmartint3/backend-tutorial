@@ -29,13 +29,19 @@ public class LoanServiceImpl implements LoanService {
 
         try {
             if (comprobacionParametrosSave(data)) {
+                System.out.println("\n\n\n\n\n\n\n\n\n\n AÑADIENDO LOAN \n\n\n\n\n\n\n\n\n\n");
+                System.out.println("GameName: " + data.getGameName());
+                System.out.println("ClientName: " + data.getClientName());
+                System.out.println("InitialDate: " + data.getInitialDate());
+                System.out.println("FinalDate: " + data.getFinalDate());
+
                 Loan loan = new Loan();
                 BeanUtils.copyProperties(data, loan, "id");
 
                 this.loanRepository.save(loan);
             }
         } catch (Exception e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("\n\n\n\n\n\n\n\n\n\nERROR: " + e.getMessage());
         }
     }
 

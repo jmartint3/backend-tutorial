@@ -184,7 +184,6 @@ public class LoanIT {
         assertNotNull(response);
         assertEquals(TOTAL_LOANS, response.getBody().getTotalElements());
         // assertEquals(EXISTS_GAME_ID, response.getBody().get(0).getId());
-        // test commit
     }
 
     @Test

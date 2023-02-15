@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -39,15 +40,13 @@ public class LoanIT {
     public static final Long MODIFY_LOAN_ID = 3L;
     public static final String NEW_LOAN_CLIENT_NAME = "Isaac";
     public static final String NEW_LOAN_GAME_NAME = "Azul";
-    public static final Date NEW_LOAN_INITIAL_DATE = new Date(2021, 12, 03);
-    public static final Date NEW_LOAN_FINAL_DATE = new Date(2021, 12, 10);
+    public static final Date NEW_LOAN_INITIAL_DATE = new GregorianCalendar(2021, 12, 03).getTime();
+    public static final Date NEW_LOAN_FINAL_DATE = new GregorianCalendar(2021, 12, 10).getTime();
 
     public static final String CLIENT_NAME_WITH_2_LOANS = "Eric";
     public static final String GAME_NAME_LOANED = "On Mars";
-    public static final Date INITIAL_DATE_EXISTING_LOAN = new Date(2023, 01, 17);
-    public static final Date FINAL_DATE_EXISTING_LOAN = new Date(2023, 01, 25);
-    public static final String ERROR_SAME_GAME_MORE_THAN_ONE_CLIENT = "El mismo juego no puede estar prestado a dos clientes distintos en un mismo día.";
-    public static final String ERROR_SAME_CLIENT_MORE_THAN_TWO_GAMES = "El cliente no puede tener más de 2 juegos en un mismo día";
+    public static final Date INITIAL_DATE_EXISTING_LOAN = new GregorianCalendar(2023, 01, 03).getTime();
+    public static final Date FINAL_DATE_EXISTING_LOAN = new GregorianCalendar(2023, 01, 25).getTime();
 
     private static final int TOTAL_LOANS = 6;
     private static final int PAGE_SIZE = 5;
@@ -166,9 +165,9 @@ public class LoanIT {
     }
 
     @Test
-    public void saveSameGameByMoreThanOneClientShouldThrowError() {
+    public void sameGameByMoreThanOneClientShouldNotSave() {
         LoanDto dto = new LoanDto();
-        dto.setClientName(CLIENT_NAME_WITH_2_LOANS);
+        dto.setClientName(NEW_LOAN_CLIENT_NAME);
         dto.setGameName(GAME_NAME_LOANED);
         dto.setInitialDate(INITIAL_DATE_EXISTING_LOAN);
         dto.setFinalDate(FINAL_DATE_EXISTING_LOAN);
@@ -183,11 +182,45 @@ public class LoanIT {
 
         assertNotNull(response);
         assertEquals(TOTAL_LOANS, response.getBody().getTotalElements());
-        // assertEquals(EXISTS_GAME_ID, response.getBody().get(0).getId());
     }
 
     @Test
-    public void saveMoreThanTwoGamesBySameClientShouldThrowError() {
+    public void moreThanTwoGamesBySameClientShouldNotSave() {
+        LoanDto dto = new LoanDto();
+        dto.setClientName(CLIENT_NAME_WITH_2_LOANS);
+        dto.setGameName(NEW_LOAN_GAME_NAME);
+        dto.setInitialDate(INITIAL_DATE_EXISTING_LOAN);
+        dto.setFinalDate(FINAL_DATE_EXISTING_LOAN);
 
+        restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
+
+        LoanSearchDto searchDto = new LoanSearchDto();
+        searchDto.setPageable(PageRequest.of(0, TOTAL_LOANS));
+
+        ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.POST,
+                new HttpEntity<>(searchDto), responseTypePage);
+
+        assertNotNull(response);
+        assertEquals(TOTAL_LOANS, response.getBody().getTotalElements());
+    }
+
+    @Test
+    public void moreThanFourteenDaysDifferenceShouldNotSave() {
+        LoanDto dto = new LoanDto();
+        dto.setClientName(NEW_LOAN_CLIENT_NAME);
+        dto.setGameName(NEW_LOAN_GAME_NAME);
+        dto.setInitialDate(new GregorianCalendar(2023, 01, 10).getTime());
+        dto.setFinalDate(new GregorianCalendar(2023, 01, 30).getTime());
+
+        restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
+
+        LoanSearchDto searchDto = new LoanSearchDto();
+        searchDto.setPageable(PageRequest.of(0, TOTAL_LOANS));
+
+        ResponseEntity<Page<LoanDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.POST,
+                new HttpEntity<>(searchDto), responseTypePage);
+
+        assertNotNull(response);
+        assertEquals(TOTAL_LOANS, response.getBody().getTotalElements());
     }
 }

@@ -42,6 +42,11 @@ public class LoanServiceImpl implements LoanService {
             }
         } catch (Exception e) {
             System.out.println("\n\n\n\n\n\n\n\n\n\nERROR: " + e.getMessage());
+            System.out.println("GameName: " + data.getGameName());
+            System.out.println("ClientName: " + data.getClientName());
+            System.out.println("InitialDate: " + data.getInitialDate());
+            System.out.println("FinalDate: " + data.getFinalDate());
+            System.out.println("\n\n\n");
         }
     }
 

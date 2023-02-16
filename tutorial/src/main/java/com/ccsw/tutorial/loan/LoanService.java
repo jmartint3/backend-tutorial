@@ -13,7 +13,7 @@ public interface LoanService {
     Page<Loan> findPage(LoanSearchDto dto, String gameName, String clientName, Date loanDate);
 
     // Guarda un nuevo préstamo
-    void save(LoanDto data);
+    void save(LoanDto data) throws Exception;
 
     // Elimina un préstamo
     void delete(Long id);

@@ -25,16 +25,13 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public void save(LoanDto data) {
+    public void save(LoanDto data) throws Exception {
 
-        try {
-            if (saveParametersComprobation(data)) {
-                Loan loan = new Loan();
-                BeanUtils.copyProperties(data, loan, "id");
+        if (saveParametersComprobation(data)) {
+            Loan loan = new Loan();
+            BeanUtils.copyProperties(data, loan, "id");
 
-                this.loanRepository.save(loan);
-            }
-        } catch (Exception e) {
+            this.loanRepository.save(loan);
         }
     }
 

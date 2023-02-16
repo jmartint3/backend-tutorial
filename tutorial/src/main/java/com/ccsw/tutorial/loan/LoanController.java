@@ -39,7 +39,7 @@ public class LoanController {
     }
 
     @RequestMapping(path = "", method = RequestMethod.PUT)
-    public void save(@RequestBody LoanDto data) {
+    public void save(@RequestBody LoanDto data) throws Exception {
         this.loanService.save(data);
     }
 

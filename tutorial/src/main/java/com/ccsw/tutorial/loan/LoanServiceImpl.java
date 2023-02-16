@@ -28,7 +28,7 @@ public class LoanServiceImpl implements LoanService {
     public void save(LoanDto data) {
 
         try {
-            if (comprobacionParametrosSave(data)) {
+            if (saveParametersComprobation(data)) {
                 System.out.println("\n\n\n\n\n\n\n\n\n\n AÑADIENDO LOAN \n\n\n\n\n\n\n\n\n\n");
                 System.out.println("GameName: " + data.getGameName());
                 System.out.println("ClientName: " + data.getClientName());
@@ -56,7 +56,7 @@ public class LoanServiceImpl implements LoanService {
 
     }
 
-    private boolean comprobacionParametrosSave(LoanDto data) throws Exception {
+    private boolean saveParametersComprobation(LoanDto data) throws Exception {
         double diff = Math.abs(data.getFinalDate().getTime() - data.getInitialDate().getTime());
         double diffDays = Math.ceil(diff / (1000 * 3600 * 24));
 

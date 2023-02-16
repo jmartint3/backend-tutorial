@@ -14,8 +14,6 @@ public class ClientServiceImpl implements ClientService {
     @Autowired
     ClientRepository clientRepository;
 
-    private Boolean isNameRepeated = false;
-
     @Override
     public List<Client> findAll() {
         return (List<Client>) this.clientRepository.findAll();
@@ -32,23 +30,10 @@ public class ClientServiceImpl implements ClientService {
             client = this.clientRepository.findById(id).orElse(null);
         }
 
-        client.setName(dto.getName());
-
-        String clientName = client.getName();
-
-        isNameRepeated = false;
-        this.findAll().forEach(arrayClient -> {
-            if (arrayClient.getName().equals(clientName)) {
-                System.out.println("ArrayClientName: " + arrayClient.getName() + ", clientName: " + clientName);
-                this.isNameRepeated = true;
-            }
-        });
-
-        if (this.isNameRepeated) {
-            return;
+        if (this.clientRepository.findByName(dto.getName()) == null) {
+            client.setName(dto.getName());
+            this.clientRepository.save(client);
         }
-
-        this.clientRepository.save(client);
     }
 
     @Override

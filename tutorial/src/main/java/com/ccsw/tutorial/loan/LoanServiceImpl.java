@@ -7,7 +7,9 @@ import javax.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ccsw.tutorial.loan.model.Loan;
 import com.ccsw.tutorial.loan.model.LoanDto;
@@ -46,7 +48,8 @@ public class LoanServiceImpl implements LoanService {
         double diffDays = Math.ceil(diff / (1000 * 3600 * 24));
 
         if (data.getFinalDate().compareTo(data.getInitialDate()) < 0 || diffDays > 14) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED,
+                    "La fecha final debe ser posterior a la inicial y como máximo pueden tener 14 días de diferencia");
         }
 
         if (this.loanRepository.findByGameName(data.getGameName(), data.getInitialDate(), data.getFinalDate())
@@ -55,11 +58,13 @@ public class LoanServiceImpl implements LoanService {
                     .size() < 2) {
                 return true;
             } else {
-                throw new Exception("El cliente no puede tener más de 2 juegos en un mismo día");
+                throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED,
+                        "El cliente no puede tener más de 2 juegos en un mismo día");
 
             }
         } else {
-            throw new Exception("El mismo juego no puede estar prestado a dos clientes distintos en un mismo día.");
+            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED,
+                    "El mismo juego no puede estar prestado a dos clientes distintos en un mismo día.");
         }
     }
 

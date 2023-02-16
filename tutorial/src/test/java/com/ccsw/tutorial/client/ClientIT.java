@@ -30,6 +30,8 @@ public class ClientIT {
     public static final Long MODIFY_CLIENT_ID = 3L;
     public static final Long DELETE_CLIENT_ID = 2L;
 
+    public static final String EXISTING_CLIENT_NAME = "Isaac";
+
     @LocalServerPort
     private int port;
 
@@ -84,6 +86,19 @@ public class ClientIT {
                 .findFirst().orElse(null);
         assertNotNull(clientSearch);
         assertEquals(NEW_CLIENT_NAME, clientSearch.getName());
+    }
+
+    @Test
+    public void saveWithExistingNameShouldNotSave() {
+        ClientDto dto = new ClientDto();
+        dto.setName(EXISTING_CLIENT_NAME);
+
+        restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(dto), Void.class);
+
+        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
+                HttpMethod.GET, null, responseType);
+        assertNotNull(response);
+        assertEquals(11, response.getBody().size());
     }
 
     @Test

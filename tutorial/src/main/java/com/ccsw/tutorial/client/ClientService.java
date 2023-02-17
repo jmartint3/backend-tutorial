@@ -14,7 +14,7 @@ public interface ClientService {
     /**
      * Método para crear o actualizar un Client
      */
-    void save(Long id, ClientDto dto);
+    void save(Long id, ClientDto dto) throws Exception;
 
     /**
      * Método para borrar un Client

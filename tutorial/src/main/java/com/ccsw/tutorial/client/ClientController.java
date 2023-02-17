@@ -36,7 +36,8 @@ public class ClientController {
      * Método para crear o actualizar un Client
      */
     @RequestMapping(path = { "", "/{id}" }, method = RequestMethod.PUT)
-    public void save(@PathVariable(name = "id", required = false) Long id, @RequestBody ClientDto dto) {
+    public void save(@PathVariable(name = "id", required = false) Long id, @RequestBody ClientDto dto)
+            throws Exception {
         this.clientService.save(id, dto);
     }
 
